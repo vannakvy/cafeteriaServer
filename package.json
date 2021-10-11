@@ -27,6 +27,7 @@
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.29.1",
     "mongoose": "^6.0.7",
+    "node-telegram-bot-api": "^0.54.0",
     "subscriptions-transport-ws": "^0.9.19"
   }
 }

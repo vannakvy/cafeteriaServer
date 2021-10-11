@@ -7,9 +7,11 @@ import { ApolloServer } from "apollo-server-express";
 import typeDefs from './graphql/typeDefs.js'
 import resolvers from './graphql/resolvers.js'
 import { PubSub } from 'graphql-subscriptions';
-import { MONGODBCONNECTION } from './config.js'
+import { CONFIG } from './config.js'
 import cors from 'cors'
 import dotenv from 'dotenv'
+import TelegramBot from 'node-telegram-bot-api'
+import mongoose from 'mongoose'
 
 (async function () {
     const app = express();
@@ -17,6 +19,8 @@ import dotenv from 'dotenv'
     dotenv.config()
 
     app.use(cors())
+
+    const bot = new TelegramBot(process.env.TELEGRAM_TOKEN, { polling: true });
 
     const pubsub = new PubSub();
 
@@ -60,16 +64,13 @@ import dotenv from 'dotenv'
 
     const PORT = process.env.PORT
 
-    new Promise(resolve => {
-        resolve(MONGODBCONNECTION())
-    }).then(
-        () => {
+    await mongoose.connect(CONFIG.MONGODB, { useNewUrlParser: true }, (err) => {
+        if (!err) {
+            console.log("DB Connected")
             httpServer.listen(PORT, () =>
                 console.log(`Server is now running on http://localhost:${PORT}/graphql`)
             );
-        }, err => {
-            console.log(err)
         }
-    )
+    })
 
 })();
