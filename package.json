@@ -19,15 +19,19 @@
     "apollo-client": "^2.6.10",
     "apollo-link-http": "^1.5.17",
     "apollo-server": "^3.3.0",
+    "axios": "^0.22.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "graphql": "^15.6.0",
     "graphql-subscriptions": "^1.2.1",
+    "graphql-ws": "^5.5.0",
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.29.1",
     "mongoose": "^6.0.7",
     "node-telegram-bot-api": "^0.54.0",
-    "subscriptions-transport-ws": "^0.9.19"
+    "subscriptions-transport-ws": "^0.9.19",
+    "websocket": "^1.0.34",
+    "ws": "^8.2.3"
   }
 }

@@ -1,21 +1,15 @@
-import postsResolvers from './resolvers/posts.js'
-import usersResolvers from './resolvers/users.js'
-import commentsResolvers from './resolvers/comments.js'
+import telegramUserResolvers from './resolvers/telegramUser.js'
+import telegramChatResolvers from './resolvers/telegramChat.js'
+import telegramOrderResolvers from './resolvers/telegramOrder.js'
 
 const index = {
     Query: {
-        ...postsResolvers.Query
+        ...telegramUserResolvers.Query
     },
     Mutation: {
-        ...usersResolvers.Mutation,
-        ...postsResolvers.Mutation,
-        ...commentsResolvers.Mutation,
-    },
-    Subscription: {
-        ...postsResolvers.Subscription
-    },
-    Post: {
-        ...postsResolvers.Post
+        ...telegramUserResolvers.Mutation,
+        ...telegramChatResolvers.Mutation,
+        ...telegramOrderResolvers.Mutation,
     }
 }
 

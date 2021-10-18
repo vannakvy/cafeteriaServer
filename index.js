@@ -12,6 +12,7 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import TelegramBot from 'node-telegram-bot-api'
 import mongoose from 'mongoose'
+import { botAction } from "./TelegramBot/botAction.js";
 
 (async function () {
     const app = express();
@@ -21,6 +22,7 @@ import mongoose from 'mongoose'
     app.use(cors())
 
     const bot = new TelegramBot(process.env.TELEGRAM_TOKEN, { polling: true });
+    botAction(bot)
 
     const pubsub = new PubSub();
 
