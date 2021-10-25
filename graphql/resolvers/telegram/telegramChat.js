@@ -1,5 +1,5 @@
-import TelegramChat from '../../models/TelegramChat.js';
-import TelegramUser from '../../models/TelegramUser.js';
+import TelegramChat from '../../../models/telegram/TelegramChat.js';
+import TelegramUser from '../../../models/telegram/TelegramUser.js';
 
 const telegramChat = {
     Query: {

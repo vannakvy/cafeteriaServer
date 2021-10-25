@@ -1,4 +1,4 @@
-import TelegramUser from '../../models/TelegramUser.js';
+import TelegramUser from '../../../models/telegram/TelegramUser.js';
 
 const telegramUser = {
     Query: {

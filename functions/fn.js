@@ -59,3 +59,15 @@ export const PostData = async (e, v) => {
 
     return data
 }
+
+export function convertTZ(date) {
+    return new Date((typeof date === "string" ? new Date(date) : date).toLocaleString("en-US", {timeZone: "Asia/Jakarta"}));   
+}
+
+export function convertQueryDate(date){
+    let hour = new Date(date).getHours()
+    let minute = new Date(date).getMinutes()
+    let second = new Date(date).getSeconds()
+
+    return new Date(new Date(new Date(new Date(date).setHours(hour)).setMinutes(minute)).setSeconds(second))
+}

@@ -1,5 +1,5 @@
-import TelegramOrder from '../../models/TelegramOrder.js';
-import TelegramUser from '../../models/TelegramUser.js';
+import TelegramOrder from '../../../models/telegram/TelegramOrder.js';
+import TelegramUser from '../../../models/telegram/TelegramUser.js';
 
 const telegramOrder = {
     Query: {
@@ -10,7 +10,7 @@ const telegramOrder = {
             input
         }, context) {
             try {
-                console.log(input)
+                // console.log(input)
                 const user = await TelegramUser.findOne({"user_id": input.user_id})
                 // console.log(user)
                 const newOrder = new TelegramOrder({
@@ -32,7 +32,7 @@ const telegramOrder = {
             input
         }, context) {
             try {
-                console.log(input)
+                // console.log(input)
                 await TelegramOrder.findOneAndUpdate({"_id": input.orderId}, {
                     text: input.text,
                     typeText: input.typeText,
