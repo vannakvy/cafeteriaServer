@@ -4,6 +4,7 @@ const customer = gql`
 
     type Customer {
         id: String!
+        idCard: String!
         lname: String!
         fname: String!
         tel: String
@@ -20,9 +21,11 @@ const customer = gql`
     type CustomerResponse {
         data: [Customer]
         message: String!
+        pagination: Pagination
     }
 
     input CustomerInputSet {
+        idCard: String
         lname: String!
         fname: String!
         tel: String
@@ -52,7 +55,7 @@ const customer = gql`
     }
 
     type Query {
-        getCustomers: CustomerResponse
+        getCustomers(input: InputPagination): CustomerResponse
         getCustomersRangeDate(input: InputRangeDate): CustomerResponse
     }
 

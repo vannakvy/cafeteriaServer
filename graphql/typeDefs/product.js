@@ -4,7 +4,7 @@ const product = gql`
 
     type Product {
         id: String!
-        code: String!
+        code: String
         description: String!
         image: String
         price: Float!
@@ -19,15 +19,17 @@ const product = gql`
     type ProductResponse {
         data: [Product]
         message: String!
+        pagination: Pagination
     }
 
     input ProductInputSet {
-        code: String!
+        code: String
         description: String!
         image: String
         price: Float!
         um: String!
         category: String!
+        inStock: Float
     }
 
     input ProductInputUpdate {
@@ -45,8 +47,10 @@ const product = gql`
     }
 
     type Query {
-        getProducts: ProductResponse
+        getProducts(input: InputPagination): ProductResponse
         getProductsRangeDate(input: InputRangeDate): ProductResponse
+        getProductById(input: InputId!): Product
+        getProductBySelectCTG(input: InputPagination): ProductResponse
     }
 
     type Mutation {

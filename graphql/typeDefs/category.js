@@ -5,6 +5,7 @@ const category = gql`
     type Category {
         id: String!
         description: String!
+        product: Int
         createAt: String
         updateAt: String
     }
@@ -28,7 +29,7 @@ const category = gql`
     }
 
     type Query {
-        getCategories: CategoryResponse
+        getCategories(input: InputPagination): CategoryResponse
         getCategoriesRangeDate(input: InputRangeDate): CategoryResponse
     }
 

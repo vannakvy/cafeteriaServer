@@ -45,9 +45,13 @@ const purchaseOrderResolvers = {
                     ...input,
                     createAt: convertTZ(new Date())
                 })
-                console.log(input)
 
-                const purchaseOrder = await newPurchaseOrder.save()
+                const purchaseOrder = await newPurchaseOrder.save().then(res => res.populate(["supplier", {
+                    path: "products",
+                    populate: "product"
+                }]))
+
+                console.log(purchaseOrder)
 
                 context.pubsub.publish('NEW_PURCHASEORDER', {
                     newPurchaseOrder: purchaseOrder

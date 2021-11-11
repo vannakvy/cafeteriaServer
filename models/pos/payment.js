@@ -10,8 +10,8 @@ const paymentSchema = new Schema({
             id: Schema.Types.ObjectId,
         }
     ],
-    createAt: String,
-    updateAt: String,
+    createAt: Date,
+    updateAt: Date,
 })
 
 const Payments = model('Payments', paymentSchema)

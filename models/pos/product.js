@@ -11,10 +11,13 @@ const productsSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "Categories"
     },
-    inStock: Number,
+    inStock: {
+        type: "Number",
+        default: 0
+    },
     remark: String,
-    createAt: String,
-    updateAt: String,
+    createAt: Date,
+    updateAt: Date,
 })
 
 const Products = model('Products', productsSchema)

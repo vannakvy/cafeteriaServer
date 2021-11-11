@@ -2,6 +2,7 @@ import pkg from 'mongoose';
 const { model, Schema } = pkg;
 
 const customersSchema = new Schema({
+    idCard: String,
     lname: String,
     fname: String,
     tel: String,
@@ -11,11 +12,12 @@ const customersSchema = new Schema({
     geolocation: {
         lat: Number,
         long: Number,
+        placename: String
     },
     uid: String,
     token: String,
-    createAt: String,
-    updateAt: String,
+    createAt: Date,
+    updateAt: Date,
 })
 
 const Customers = model('Customers', customersSchema)

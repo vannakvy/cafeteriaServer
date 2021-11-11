@@ -14,8 +14,8 @@ const deliversSchema = new Schema({
     },
     uid: String,
     token: String,
-    createAt: String,
-    updateAt: String,
+    createAt: Date,
+    updateAt: Date,
 })
 
 const Delivers = model('Delivers', deliversSchema)

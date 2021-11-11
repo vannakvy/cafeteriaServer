@@ -3,19 +3,18 @@ import { gql } from 'apollo-server'
 const purchaseOrder = gql`
 
     type PurchaseOrder {
-        id: String!
-        supplier: String!
+        id: String
+        code: String
+        supplier: Supplier
         tel: String
-        date: String!
+        date: Float
         remark: String
         products: [PurchaseOrderProduct]!
         subTotal: Float
         tax: Float
         offer: Float
         grandTotal: Float
-        status: Status
-        payment: [String]
-        geolocation: Geolocation
+        payment: Float
         createAt: String
         updateAt: String
     }
@@ -30,6 +29,7 @@ const purchaseOrder = gql`
     type PurchaseOrderResponse {
         data: [PurchaseOrder]
         message: String!
+        pagination: Pagination
     }
 
     input PurchaseOrderInputSet {
@@ -37,13 +37,21 @@ const purchaseOrder = gql`
         tel: String
         date: String!
         remark: String
-        products: [PurchaseOrderProductInput]!
+        products: [PurchaseOrderInputSubSet]!
         subTotal: Float
         tax: Float
         offer: Float
+        delivery: Float
         grandTotal: Float
-        status: InputStatus
-        geolocation: InputGeolocation
+        payment: Float
+    }
+
+    input PurchaseOrderInputSubSet {
+        product: String!
+        price: Float
+        qty: Float!
+        total: Float!
+        remark: String
     }
 
     input PurchaseOrderInputUpdate {
@@ -55,31 +63,35 @@ const purchaseOrder = gql`
         subTotal: Float
         tax: Float
         offer: Float
+        delivery: Float
         grandTotal: Float
-        status: InputStatus
-        geolocation: InputGeolocation
+        payment: Float
     }
     
     input PurchaseOrderInputDelete {
         id: String!
     }
 
-    input PurchaseOrderProductInput {
-        product: String!
-        price: Float!
+    input PurchaseOrderInputSubAdd {
+        orderId: String!
+        id: String!
+        price: Float
         qty: Float!
         total: Float!
+        remark: String
     }
 
     input PurchaseOrderInputSubUpdate {
+        orderId: String!
         id: String!
         price: Float
         qty: Float
         total: Float
+        remark: String
     }
 
     type Query {
-        getPurchaseOrders: PurchaseOrderResponse
+        getPurchaseOrders(input: InputPagination): PurchaseOrderResponse
         getPurchaseOrdersRangeDate(input: InputRangeDate): PurchaseOrderResponse
     }
 
@@ -88,7 +100,7 @@ const purchaseOrder = gql`
         updatePurchaseOrders(input: PurchaseOrderInputUpdate): String
         deletePurchaseOrders(input: PurchaseOrderInputDelete): String
 
-        setSubPurchaseOrders(id: String, input: PurchaseOrderProductInput): String
+        setSubPurchaseOrders(input: PurchaseOrderInputSubAdd): String
         updateSubPurchaseOrders(input: PurchaseOrderInputSubUpdate): String
         deleteSubPurchaseOrders(input: PurchaseOrderInputDelete): String
     }

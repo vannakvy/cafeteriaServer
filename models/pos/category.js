@@ -3,8 +3,8 @@ const { model, Schema } = pkg;
 
 const categoriesSchema = new Schema({
     description: String,
-    createAt: String,
-    updateAt: String,
+    createAt: Date,
+    updateAt: Date,
 })
 
 const Categories = model('Categories', categoriesSchema)

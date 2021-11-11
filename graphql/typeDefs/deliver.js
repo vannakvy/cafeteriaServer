@@ -20,6 +20,7 @@ const deliver = gql`
     type DeliverResponse {
         data: [Deliver]
         message: String!
+        pagination: Pagination
     }
 
     input DeliverInputSet {
@@ -52,7 +53,7 @@ const deliver = gql`
     }
 
     type Query {
-        getDelivers: DeliverResponse
+        getDelivers(input: InputPagination): DeliverResponse
         getDeliversRangeDate(input: InputRangeDate): DeliverResponse
     }
 

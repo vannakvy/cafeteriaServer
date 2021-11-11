@@ -1,16 +1,44 @@
 import { AuthenticationError } from "apollo-server-errors"
 import { convertTZ } from "../../../functions/fn.js"
 import Delivers from "../../../models/pos/deliver.js"
+import mongoose from 'mongoose'
 
 const deliverResolvers = {
     Query: {
-        async getDelivers() {
+        async getDelivers(_,{
+            input
+        }, context) {
             try {
-                const delivers = await Delivers.find().sort({ createdAt: -1 })
+                const reg = new RegExp(input?.keyword)
+                let delivers = []
+                if (input?.keyword === null || input?.keyword === "") {
+                    delivers = await Delivers.find().sort({ createAt: -1 }).skip((input?.current - 1) * input?.limit).limit(input?.limit)
+                } else {
+                    if (mongoose.Types.ObjectId.isValid(input?.keyword)) {
+                        delivers = await Delivers.find({
+                            $or: [
+                                { "_id": mongoose.Types.ObjectId(input?.keyword) }
+                            ]
+                        }).sort({ createAt: -1 }).skip((input?.current - 1) * input?.limit).limit(input?.limit)
+                    } else {
+                        delivers = await Delivers.find({
+                            $or: [
+                                { "lname": reg },
+                                { "fname": reg }
+                            ]
+                        }).sort({ createAt: -1 }).skip((input?.current - 1) * input?.limit).limit(input?.limit)
+                    }
+                }
+
+                const pageCount = await Delivers.countDocuments()
 
                 return {
                     data: delivers,
-                    message: "ការបញ្ចូលបានជោគជ័យ"
+                    message: "ការបញ្ចូលបានជោគជ័យ",
+                    pagination: {
+                        current: input?.current,
+                        count: parseInt(pageCount)
+                    }
                 }
             } catch (err) {
                 throw new Error(err)
@@ -38,12 +66,12 @@ const deliverResolvers = {
             input
         }, context) {
             try {
-                const reg = new RegExp(input.lname)
-                const reg1 = new RegExp(input.fname)
-                const findDeliver = await Delivers.find({ $and: [
-                    {"lname": reg},
-                    {"fname": reg1},
-                ] })
+                const findDeliver = await Delivers.find({
+                    $and: [
+                        { "lname": input.lname },
+                        { "fname": input.fname },
+                    ]
+                })
 
                 if (findDeliver?.length === 0) {
                     const newDeliver = new Delivers({
@@ -53,13 +81,20 @@ const deliverResolvers = {
 
                     const deliver = await newDeliver.save()
 
-                    context.pubsub.publish('NEW_DELIVER', {
-                        newDeliver: deliver
+                    context.pubsub.publish('NEW_NOTICE', {
+                        newNotice: {
+                            id: deliver?.id,
+                            action: "create",
+                            title: `បានបង្កើតអ្នកដឹកជញ្ជូន`,
+                            content: `លេខ៖ ${deliver?.id}`,
+                            user: "",
+                            createAt: new Date()
+                        }
                     })
 
                     return deliver
                 } else {
-                    throw new AuthenticationError('Action not allowed')
+                    throw new Error('Deliver has been created')
                 }
             } catch (err) {
                 throw new Error(err)
@@ -69,15 +104,26 @@ const deliverResolvers = {
             input
         }, context) {
             try {
-                const findProduct = await Delivers.findByIdAndUpdate(input.id, {
+                const findDeliver = await Delivers.findByIdAndUpdate(input.id, {
                     ...input,
                     updateAt: convertTZ(new Date())
                 })
 
-                if (findProduct !== null) {
+                if (findDeliver !== null) {
+                    context.pubsub.publish('NEW_NOTICE', {
+                        newNotice: {
+                            id: findDeliver.id,
+                            action: "update",
+                            title: `បានកែប្រែអ្នកដឹកជញ្ជូន`,
+                            content: `លេខ៖ ${input.id}`,
+                            user: "",
+                            createAt: convertTZ(new Date())
+                        }
+                    })
+
                     return "ការកែប្រែបានជោគជ័យ"
                 } else {
-                    throw new AuthenticationError('Action not allowed')
+                    throw new Error("Can't update data")
                 }
 
             } catch (err) {
@@ -91,9 +137,20 @@ const deliverResolvers = {
                 const findDeliver = await Delivers.findByIdAndDelete(input.id)
 
                 if (findDeliver !== null) {
+                    context.pubsub.publish('NEW_NOTICE', {
+                        newNotice: {
+                            id: findDeliver.id,
+                            action: "delete",
+                            title: `បានលុបអ្នកដឹកជញ្ជូន`,
+                            content: `លេខ៖ ${input.id}`,
+                            user: "",
+                            createAt: convertTZ(new Date())
+                        }
+                    })
+
                     return "ការលុបបានជោគជ័យ"
                 } else {
-                    throw new AuthenticationError('Action not allowed')
+                    throw new Error('Action not allowed')
                 }
             } catch (err) {
                 throw new Error(err)

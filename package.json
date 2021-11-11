@@ -24,6 +24,7 @@
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
+    "expo-server-sdk": "^3.6.0",
     "graphql": "^15.6.0",
     "graphql-subscriptions": "^1.2.1",
     "graphql-ws": "^5.5.0",
@@ -31,9 +32,11 @@
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.33",
     "mongoose": "^6.0.7",
+    "mongoose-sequence": "^5.3.1",
     "node-telegram-bot-api": "^0.54.0",
     "subscriptions-transport-ws": "^0.9.19",
     "websocket": "^1.0.34",
-    "ws": "^8.2.3"
+    "ws": "^8.2.3",
+    "yarn": "^1.22.17"
   }
 }

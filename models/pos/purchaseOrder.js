@@ -2,12 +2,13 @@ import pkg from 'mongoose';
 const { model, Schema } = pkg;
 
 const purchaseOrderSchema = new Schema({
-    supplier:{
+    code: String,
+    supplier: {
         type: Schema.Types.ObjectId,
         ref: "Suppliers"
     },
     tel: String,
-    date: String,
+    date: Date,
     remark: String,
     products: [
         {
@@ -18,32 +19,35 @@ const purchaseOrderSchema = new Schema({
             price: Number,
             qty: Number,
             total: Number,
+            remark: String,
         }
     ],
-    subTotal: Number,
-    tax: Number,
-    offer: Number,
-    grandTotal: Number,
-    status: {
-        isPrepared: Boolean,
-        isCooked: Boolean,
-        isDelivered: Boolean,
-        isPaid: Boolean,
+    subTotal: {
+        type: Number,
+        default: 0
     },
-    payment: [
-        {
-            id: {
-                type: Schema.Types.ObjectId,
-                ref: "Payments"
-            }
-        }
-    ],
-    geolocation: {
-        lat: Number,
-        long: Number,
+    tax: {
+        type: Number,
+        default: 0
     },
-    createAt: String,
-    updateAt: String,
+    offer: {
+        type: Number,
+        default: 0
+    },
+    delivery: {
+        type: Number,
+        default: 0
+    },
+    grandTotal: {
+        type: Number,
+        default: 0
+    },
+    payment: {
+        type: Number,
+        default: 0
+    },
+    createAt: Date,
+    updateAt: Date,
 })
 
 const PurchaseOrders = model('PurchaseOrders', purchaseOrderSchema)

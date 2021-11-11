@@ -3,8 +3,10 @@ import { gql } from 'apollo-server'
 const supplier = gql`
 
     type Supplier {
-        id: String!
-        name: String!
+        id: String
+        companyName: String
+        lname: String
+        fname: String
         tel: String
         email: String
         image: String
@@ -19,10 +21,13 @@ const supplier = gql`
     type SupplierResponse {
         data: [Supplier]
         message: String!
+        pagination: Pagination
     }
 
     input SupplierInputSet {
-        name: String!
+        companyName: String!
+        lname: String
+        fname: String
         tel: String
         email: String
         image: String
@@ -34,7 +39,9 @@ const supplier = gql`
 
     input SupplierInputUpdate {
         id: String!
-        name: String
+        companyName: String
+        lname: String
+        fname: String
         tel: String
         email: String
         image: String
@@ -49,7 +56,7 @@ const supplier = gql`
     }
 
     type Query {
-        getSuppliers: SupplierResponse
+        getSuppliers(input: InputPagination): SupplierResponse
         getSuppliersRangeDate(input: InputRangeDate): SupplierResponse
     }
 
