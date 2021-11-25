@@ -1,20 +1,62 @@
 import { AuthenticationError } from "apollo-server-errors"
 import { convertTZ } from "../../../functions/fn.js"
 import PurchaseOrders from "../../../models/pos/purchaseOrder.js"
+import Products from "../../../models/pos/product.js"
+import mongoose from 'mongoose'
 
 const purchaseOrderResolvers = {
     Query: {
-        async getPurchaseOrders() {
+        async getPurchaseOrders(_, {
+            input
+        }, context) {
             try {
-                const purchaseOrder = await PurchaseOrders.find().sort({ createdAt: -1 }).populate({
-                    path: "products",
-                    populate: "product"
-                })
+                let purchaseOrder = []
+                if (input?.keyword === null || input?.keyword === "") {
+                    purchaseOrder = await PurchaseOrders.find().skip((input?.current - 1) * input?.limit).limit(input?.limit).populate(["supplier", {
+                        path: "products",
+                        populate: "product"
+                    }]).sort({ createAt: -1 })
+
+                } else {
+                    if (mongoose.Types.ObjectId.isValid(input?.keyword)) {
+                        purchaseOrder = await PurchaseOrders.find({
+                            $or: [
+                                { "_id": mongoose.Types.ObjectId(input?.keyword) }
+                            ]
+                        }).sort({ createAt: -1 }).skip((input?.current - 1) * input?.limit).limit(input?.limit).populate(["supplier", {
+                            path: "products",
+                            populate: "product"
+                        }]).sort({ createAt: -1 })
+                    }
+                }
+                // const purchaseOrder = await PurchaseOrders.find().sort({ createdAt: -1 }).populate(["supplier", {
+                //     path: "products",
+                //     populate: "product"
+                // }])
 
                 return {
                     data: purchaseOrder,
                     message: "ការបញ្ចូលបានជោគជ័យ"
                 }
+            } catch (err) {
+                throw new Error(err)
+            }
+        },
+        async getPurchaseOrderById(_, {
+            input
+        }, context){
+            try {
+                const purchaseOrder = await PurchaseOrders.findById(input.id).populate([
+                    "supplier",
+                    {
+                        path: "products",
+                        populate: "product"
+                    }
+                ])
+
+                // console.log(saleOrder)
+
+                return purchaseOrder
             } catch (err) {
                 throw new Error(err)
             }
@@ -51,11 +93,33 @@ const purchaseOrderResolvers = {
                     populate: "product"
                 }]))
 
-                console.log(purchaseOrder)
+                // console.log(purchaseOrder)
 
-                context.pubsub.publish('NEW_PURCHASEORDER', {
-                    newPurchaseOrder: purchaseOrder
+                // start update product stockOut
+                await purchaseOrder?.products?.map(async load => {
+                    return await Products.findOneAndUpdate(
+                        { "_id": load.product.id },
+                        { $inc: { 'inStock': load.qty } }
+                    )
                 })
+                // end update product stockOut
+
+                if (purchaseOrder !== null) {
+                    context.pubsub.publish('NEW_PURCHASEORDER', {
+                        newPurchaseOrder: purchaseOrder
+                    })
+
+                    context.pubsub.publish('NEW_NOTICE', {
+                        newNotice: {
+                            id: purchaseOrder?.id,
+                            action: "create",
+                            title: `បានបង្កើតការបញ្ជាទិញ`,
+                            content: `លេខ៖ ${purchaseOrder?.id}`,
+                            user: "",
+                            createAt: new Date()
+                        }
+                    })
+                }
 
                 return purchaseOrder
             } catch (err) {
@@ -71,10 +135,38 @@ const purchaseOrderResolvers = {
                     updateAt: convertTZ(new Date())
                 })
 
+                const findPOandSub = await PurchaseOrders.findOne({ "_id": input.id }).populate({
+                    path: "products",
+                    populate: "product"
+                })
+
+                let subTotal = 0
+                await findPOandSub?.products?.map(load => {
+                    return subTotal += parseFloat(load.total)
+                })
+
+                let grandTotal = subTotal + findPOandSub?.tax - findPOandSub?.offer
+
+                await PurchaseOrders.findByIdAndUpdate(input.id, {
+                    subTotal: subTotal,
+                    grandTotal: grandTotal
+                })
+
                 if (findPurchaseOrder !== null) {
+                    context.pubsub.publish('NEW_NOTICE', {
+                        newNotice: {
+                            id: findPurchaseOrder?.id,
+                            action: "update",
+                            title: `បានកែប្រែការបញ្ជាទិញ`,
+                            content: `លេខ៖ ${findPurchaseOrder?.id}`,
+                            user: "",
+                            createAt: new Date()
+                        }
+                    })
+
                     return "ការកែប្រែបានជោគជ័យ"
                 } else {
-                    throw new AuthenticationError('Action not allowed')
+                    throw new Error('Purchase Order no found')
                 }
 
             } catch (err) {
@@ -87,26 +179,83 @@ const purchaseOrderResolvers = {
             try {
                 const findPurchaseOrder = await PurchaseOrders.findByIdAndDelete(input.id)
 
+                await findPurchaseOrder?.products?.map(async load => {
+                    return await Products.findOneAndUpdate(
+                        { "_id": load.product },
+                        { $inc: { 'inStock': 0 - load.qty } }
+                    )
+                })
+
                 if (findPurchaseOrder !== null) {
+                    context.pubsub.publish('NEW_NOTICE', {
+                        newNotice: {
+                            id: findPurchaseOrder?.id,
+                            action: "delete",
+                            title: `បានលុបការកម្ម៉ង`,
+                            content: `លេខ៖ ${findPurchaseOrder?.id}`,
+                            user: "",
+                            createAt: new Date()
+                        }
+                    })
+
                     return "ការលុបបានជោគជ័យ"
                 } else {
-                    throw new AuthenticationError('Action not allowed')
+                    throw new Error('Purchase Order no found')
                 }
             } catch (err) {
                 throw new Error(err)
             }
         },
         async setSubPurchaseOrders(_, {
-            id, input
+            input
         }, context) {
             try {
-                const findPurchaseOrder = await PurchaseOrders.findOneAndUpdate(id, {
-                    "$push": {
-                        products: input
-                    }
-                })
 
-                const findPOandSub = await PurchaseOrders.findById(id).populate({
+                const findProductInPO = await PurchaseOrders.findOne({
+                    $and: [
+                        { "_id": input.orderId },
+                        { "products.product": input?.id }
+                    ]
+                }).select("products.$")
+
+                // console.log(findProductInSale)
+
+                if (findProductInPO) {
+                    await PurchaseOrders.updateOne({
+                        $and: [
+                            { "_id": input.orderId },
+                            { "products.product": input?.id }
+                        ]
+                    },
+                        {
+                            '$set': {
+                                'products.$.price': input.price,
+                                'products.$.qty': input.qty + findProductInSale?.products[0]?.qty,
+                                'products.$.total': input.total + findProductInSale?.products[0]?.total
+                            }
+                        })
+                } else {
+                    await PurchaseOrders.findOneAndUpdate({ "_id": input.orderId }, {
+                        "$push": {
+                            products: {
+                                product: input?.id,
+                                qty: input?.qty,
+                                price: input?.price,
+                                total: input?.total,
+                                remark: input?.remark
+                            }
+                        }
+                    })
+                }
+                
+                // start update product stockOut
+                await Products.findOneAndUpdate(
+                    { "_id": input?.id },
+                    { $inc: { 'inStock': input?.qty } }
+                )
+                // end update product stockOut
+
+                const findPOandSub = await PurchaseOrders.findOne({ "_id": input.orderId }).populate({
                     path: "products",
                     populate: "product"
                 })
@@ -118,15 +267,26 @@ const purchaseOrderResolvers = {
 
                 let grandTotal = subTotal + findPOandSub?.tax - findPOandSub?.offer
 
-                await PurchaseOrders.findByIdAndUpdate(id, {
+                const findPurchaseOrder = await PurchaseOrders.findByIdAndUpdate(input.orderId, {
                     subTotal: subTotal,
                     grandTotal: grandTotal
                 })
 
                 if (findPurchaseOrder !== null) {
+                    context.pubsub.publish('NEW_NOTICE', {
+                        newNotice: {
+                            id: findPurchaseOrder?.id,
+                            action: "delete",
+                            title: `បានបន្ថែមទំនិញក្នុងការបញ្ជាទិញ`,
+                            content: `លេខ៖ ${findPurchaseOrder?.id}`,
+                            user: "",
+                            createAt: new Date()
+                        }
+                    })
+
                     return "ការកែប្រែបានជោគជ័យ"
                 } else {
-                    throw new AuthenticationError('Action not allowed')
+                    throw new Error('Purchase Order no found')
                 }
 
             } catch (err) {
@@ -137,19 +297,60 @@ const purchaseOrderResolvers = {
             input
         }, context) {
             try {
-                const findPurchaseOrder = await PurchaseOrders.updateOne({ "products._id": input.id },
+                console.log(input)
+                // start update product stockOut
+                const findSubPOOut = await PurchaseOrders.findOne({
+                    $and: [
+                        { "_id": input.orderId },
+                        { "products._id": input.id }
+                    ]
+                }).select("products.$")
+
+                const productOut = findSubPOOut?.products[0]
+                await Products.findOneAndUpdate(
+                    { "_id": productOut.product },
+                    { $inc: { 'inStock': 0 - productOut.qty } }
+                )
+                // end update product stockOut
+
+                const findPurchaseOrder = await PurchaseOrders.updateOne({
+                    $and: [
+                        { "_id": input.orderId },
+                        { "products._id": input.id }
+                    ]
+                },
                     {
                         '$set': {
                             'products.$.price': input.price,
                             'products.$.qty': input.qty,
                             'products.$.total': input.total,
                         }
-                    })
+                    }).select("products.$")
 
-                const findPOandSub = await PurchaseOrders.findOne({ "products._id": input.id }).populate({
+                // start update product stockOut
+                const findSubPOIn = await PurchaseOrders.findOne({
+                    $and: [
+                        { "_id": input.orderId },
+                        { "products._id": input.id }
+                    ]
+                }).select("products.$")
+
+                const productIn = findSubPOIn?.products[0]
+                await Products.findOneAndUpdate(
+                    { "_id": productIn.product },
+                    { $inc: { 'inStock': productIn.qty } }
+                )
+                // end update product stockOut
+
+                const findPOandSub = await PurchaseOrders.findOne({
+                    $and: [
+                        { "_id": input.orderId },
+                        { "products._id": input.id }
+                    ]
+                }).populate(["supplier", {
                     path: "products",
                     populate: "product"
-                })
+                }])
 
                 let subTotal = 0
                 await findPOandSub?.products?.map(load => {
@@ -158,19 +359,30 @@ const purchaseOrderResolvers = {
 
                 let grandTotal = subTotal + findPOandSub?.tax - findPOandSub?.offer
 
-                await PurchaseOrders.findOneAndUpdate(findPOandSub?._id, {
+                await PurchaseOrders.findOneAndUpdate({_id: findPOandSub?._id}, {
                     subTotal: subTotal,
                     grandTotal: grandTotal
                 })
 
-                // const findPO = await PurchaseOrders.findById(findPOandSub?._id)
+                // const findPO = await SaleOrders.findById(findPOandSub?._id)
 
                 // console.log(findPO)
 
                 if (findPurchaseOrder !== null) {
+                    context.pubsub.publish('NEW_NOTICE', {
+                        newNotice: {
+                            id: input?.id,
+                            action: "delete",
+                            title: `បានកែប្រែទំនិញក្នុងការបញ្ជាទិញ`,
+                            content: `លេខ៖ ${input?.id}`,
+                            user: "",
+                            createAt: new Date()
+                        }
+                    })
+
                     return "ការកែប្រែបានជោគជ័យ"
                 } else {
-                    throw new AuthenticationError('Action not allowed')
+                    throw new Error('SaleOrder no found')
                 }
 
             } catch (err) {

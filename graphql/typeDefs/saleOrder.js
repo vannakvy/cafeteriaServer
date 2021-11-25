@@ -3,7 +3,7 @@ import { gql } from 'apollo-server'
 const saleOrder = gql`
 
     type SaleOrder {
-        id: String!
+        id: ID!
         customer: SaleOrderCustomer
         deliver: SaleOrderDeliver
         tel: String

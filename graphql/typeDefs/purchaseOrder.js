@@ -3,16 +3,18 @@ import { gql } from 'apollo-server'
 const purchaseOrder = gql`
 
     type PurchaseOrder {
-        id: String
+        id: ID
         code: String
         supplier: Supplier
         tel: String
         date: Float
         remark: String
         products: [PurchaseOrderProduct]!
+        productCount: Int
         subTotal: Float
         tax: Float
         offer: Float
+        delivery: Float
         grandTotal: Float
         payment: Float
         createAt: String
@@ -24,6 +26,7 @@ const purchaseOrder = gql`
         price: Float
         qty: Float!
         total: Float!
+        id: ID
     }
 
     type PurchaseOrderResponse {
@@ -92,6 +95,7 @@ const purchaseOrder = gql`
 
     type Query {
         getPurchaseOrders(input: InputPagination): PurchaseOrderResponse
+        getPurchaseOrderById(input: InputId): PurchaseOrder
         getPurchaseOrdersRangeDate(input: InputRangeDate): PurchaseOrderResponse
     }
 

@@ -385,7 +385,12 @@ const saleOrderResolvers = {
         }, context) {
             try {
                 // start update product stockIn
-                const findSubSaleOrderIn = await SaleOrders.findOne({ "products._id": input.id }).select("products.$")
+                const findSubSaleOrderIn = await SaleOrders.findOne({
+                    $and: [
+                        { "_id": input.orderId },
+                        { "products._id": input.id }
+                    ]
+                }).select("products.$")
 
                 const productIn = findSubSaleOrderIn?.products[0]
                 await Products.findOneAndUpdate(
@@ -394,7 +399,12 @@ const saleOrderResolvers = {
                 )
                 // end update product stockIn
 
-                const findSaleOrder = await SaleOrders.updateOne({ "products._id": input?.id },
+                const findSaleOrder = await SaleOrders.updateOne({
+                    $and: [
+                        { "_id": input.orderId },
+                        { "products._id": input.id }
+                    ]
+                },
                     {
                         '$set': {
                             'products.$.price': input.price,
@@ -404,7 +414,12 @@ const saleOrderResolvers = {
                     }).select("products.$")
 
                 // start update product stockOut
-                const findSubSaleOrderOut = await SaleOrders.findOne({ "products._id": input.id }).select("products.$")
+                const findSubSaleOrderOut = await SaleOrders.findOne({
+                    $and: [
+                        { "_id": input.orderId },
+                        { "products._id": input.id }
+                    ]
+                }).select("products.$")
 
                 const productOut = findSubSaleOrderOut?.products[0]
                 await Products.findOneAndUpdate(
@@ -413,7 +428,12 @@ const saleOrderResolvers = {
                 )
                 // end update product stockOut
 
-                const findPOandSub = await SaleOrders.findOne({ "products._id": input?.id }).populate(["customer", "deliver", {
+                const findPOandSub = await SaleOrders.findOne({
+                    $and: [
+                        { "_id": input.orderId },
+                        { "products._id": input.id }
+                    ]
+                }).populate(["customer", "deliver", {
                     path: "products",
                     populate: "product"
                 }])
@@ -425,7 +445,7 @@ const saleOrderResolvers = {
 
                 let grandTotal = subTotal + findPOandSub?.tax - findPOandSub?.offer
 
-                await SaleOrders.findOneAndUpdate(findPOandSub?._id, {
+                await SaleOrders.findOneAndUpdate({_id: findPOandSub?._id}, {
                     subTotal: subTotal,
                     grandTotal: grandTotal
                 })

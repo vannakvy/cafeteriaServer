@@ -10,6 +10,8 @@ import purchaseOrderResolvers from './resolvers/pos/purchaseOrder.js'
 import saleOrderResolvers from './resolvers/pos/saleOrder.js'
 import globalResolvers from './resolvers/pos/global.js'
 import reconciliationResolvers from './resolvers/pos/reconciliation.js'
+import userResolvers from './resolvers/pos/user.js'
+import contentResolvers from './resolvers/pos/content.js'
 
 const index = {
     ...globalResolvers.General,
@@ -22,7 +24,9 @@ const index = {
         ...purchaseOrderResolvers.Query,
         ...saleOrderResolvers.Query,
         ...reconciliationResolvers.Query,
+        ...userResolvers.Query,
 
+        ...contentResolvers.Query,
         ...telegramUserResolvers.Query
     },
     Mutation: {
@@ -34,7 +38,9 @@ const index = {
         ...purchaseOrderResolvers.Mutation,
         ...saleOrderResolvers.Mutation,
         ...reconciliationResolvers.Mutation,
+        ...userResolvers.Mutation,
 
+        ...contentResolvers.Mutation,
         ...telegramUserResolvers.Mutation,
         ...telegramChatResolvers.Mutation,
         ...telegramOrderResolvers.Mutation,
@@ -46,10 +52,13 @@ const index = {
         ...deliverResolvers.Subscription,
         ...supplierResolvers.Subscription,
         ...purchaseOrderResolvers.Subscription,
+        ...userResolvers.Subscription,
 
         ...saleOrderResolvers.Subscription,
 
-        ...globalResolvers.Subscription
+        ...globalResolvers.Subscription,
+
+        ...contentResolvers.Subscription,
     }
 }
 

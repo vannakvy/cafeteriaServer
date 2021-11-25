@@ -4,6 +4,9 @@ const globalResolvers = {
         SaleOrder: {
             productCount: (parent) => parent.products.length
         },
+        PurchaseOrder: {
+            productCount: (parent) => parent.products.length
+        },
     },
     Query: {
         

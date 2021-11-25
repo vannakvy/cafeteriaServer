@@ -60,7 +60,7 @@ const reconciliationResolvers = {
                     }
                 ])
 
-                console.log(lastRecon)
+                // console.log(lastRecon)
 
                 if (lastRecon.length !== 0) {
                     await Reconciliation.findOneAndDelete({ "code": code })
@@ -158,7 +158,7 @@ const reconciliationResolvers = {
                         }
                     ])
 
-                    console.log(saleOrder)
+                    // console.log(saleOrder)
 
                     const recon = new Reconciliation({
                         ...input,
