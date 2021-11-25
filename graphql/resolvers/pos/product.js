@@ -49,6 +49,7 @@ const productResolvers = {
             input
         }, context) {
             try {
+                console.log(input)
                 const product = await Products.findById(input.id).populate("category")
 
                 return product
@@ -107,6 +108,18 @@ const productResolvers = {
         }
     },
     Mutation: {
+        async getProductById(_, {
+            input
+        }, context) {
+            try {
+                console.log(input)
+                const product = await Products.findById(input.id).populate("category")
+
+                return product
+            } catch (err) {
+                throw new Error(err)
+            }
+        },
         async setProducts(_, {
             input
         }, context) {

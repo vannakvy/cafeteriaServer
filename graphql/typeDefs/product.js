@@ -54,6 +54,7 @@ const product = gql`
     }
 
     type Mutation {
+        getProductById(input: InputId!): Product    
         setProducts(input: ProductInputSet): Product
         updateProducts(input: ProductInputUpdate): String
         deleteProducts(input: ProductInputDelete): String
