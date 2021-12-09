@@ -12,10 +12,13 @@ import globalResolvers from './resolvers/pos/global.js'
 import reconciliationResolvers from './resolvers/pos/reconciliation.js'
 import userResolvers from './resolvers/pos/user.js'
 import contentResolvers from './resolvers/pos/content.js'
+import dashboardResolvers from './resolvers/pos/dashboard.js'
+import reportResolvers from './resolvers/pos/report.js'
 
 const index = {
     ...globalResolvers.General,
     Query: {
+        ...dashboardResolvers.Query,
         ...categoryResolvers.Query,
         ...productResolvers.Query,
         ...customerResolvers.Query,
@@ -24,6 +27,7 @@ const index = {
         ...purchaseOrderResolvers.Query,
         ...saleOrderResolvers.Query,
         ...reconciliationResolvers.Query,
+        ...reportResolvers.Query,
         ...userResolvers.Query,
 
         ...contentResolvers.Query,
@@ -38,6 +42,7 @@ const index = {
         ...purchaseOrderResolvers.Mutation,
         ...saleOrderResolvers.Mutation,
         ...reconciliationResolvers.Mutation,
+        ...reportResolvers.Mutation,
         ...userResolvers.Mutation,
 
         ...contentResolvers.Mutation,

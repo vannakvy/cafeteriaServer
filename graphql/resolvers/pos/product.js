@@ -9,9 +9,26 @@ const productResolvers = {
             input
         }, context) {
             try {
+                // console.log(input, "test1")
                 const reg = new RegExp(input?.keyword)
+                let pageCount = await Products.countDocuments()
+
                 let product = []
-                if (input?.keyword === null || input?.keyword === "") {
+                if (input.sort.name !== "") {
+                    if (input.filter.value !== "emply") {
+                        let filterCondition = { [input.filter.name]: mongoose.Types.ObjectId(input.filter.value) }
+                        let sortCondition = { [input.sort.name === "category" ? "createAt" : input.sort.name]: input.sort.value === "desc" ? -1 : 1}
+
+                        // console.log(sortCondition)
+                        product = await Products.find(filterCondition).sort(sortCondition).populate("category").skip((input?.current - 1) * input?.limit).limit(input?.limit)
+
+                        pageCount = await Products.find(filterCondition).countDocuments()
+                    } else {
+                        // console.log({ [input.filter.name]: input.sort === "desc" ? -1 : 1 })
+                        product = await Products.find().sort({ [input.sort.name]: input.sort.value === "desc" ? -1 : 1 }).populate("category").skip((input?.current - 1) * input?.limit).limit(input?.limit)
+                    }
+
+                } else if (input?.keyword === null || input?.keyword === "" || input?.sort === "") {
                     product = await Products.find().sort({ createAt: -1 }).populate("category").skip((input?.current - 1) * input?.limit).limit(input?.limit)
                 } else {
                     if (mongoose.Types.ObjectId.isValid(input?.keyword)) {
@@ -30,8 +47,6 @@ const productResolvers = {
                         }).sort({ createAt: -1 }).populate("category").skip((input?.current - 1) * input?.limit).limit(input?.limit)
                     }
                 }
-
-                const pageCount = await Products.countDocuments()
 
                 return {
                     data: product,

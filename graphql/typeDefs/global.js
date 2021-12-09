@@ -37,6 +37,10 @@ const global = gql`
         createAt: String,
     }
 
+    input InputDate {
+        date: String!
+    }
+    
     input InputRangeDate {
         startDate: String!
         endDate: String!
@@ -81,6 +85,13 @@ const global = gql`
         current: Int
         limit: Int
         keyword: String
+        sort: InputFilter
+        filter: InputFilter
+    }
+
+    input InputFilter {
+        name: String
+        value: String
     }
     
     type Subscription{

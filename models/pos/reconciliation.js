@@ -51,7 +51,7 @@ const reconciliationSchema = new Schema({
                     defualt: 0
                 }
             },
-            physical:{
+            physical: {
                 qty: {
                     type: Number,
                     default: 0
@@ -95,6 +95,48 @@ const reconciliationSchema = new Schema({
             },
         }
     ],
+    accounting: {
+        openning: {
+            paid: {
+                type: Number,
+                default: 0
+            },
+            nonPaid: {
+                type: Number,
+                default: 0
+            }
+        },
+        income: {
+            paid: {
+                type: Number,
+                default: 0
+            },
+            nonPaid: {
+                type: Number,
+                default: 0
+            }
+        },
+        expense: {
+            paid: {
+                type: Number,
+                default: 0
+            },
+            nonPaid: {
+                type: Number,
+                default: 0
+            }
+        },
+        closing: {
+            paid: {
+                type: Number,
+                default: 0
+            },
+            nonPaid: {
+                type: Number,
+                default: 0
+            }
+        }
+    },
     date: Date,
     remark: String,
     createAt: Date,

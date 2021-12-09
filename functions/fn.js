@@ -98,13 +98,45 @@ export const PushSingleNotification = async (data) => {
     }
 }
 
-export const marge2Array = (arr1, arr2) => {
-    return arr1.map((item, i) => Object.assign({}, item, arr2[i]))
+export const marge2Array = (arr1, arr2, arrKey) => {
+    // var array = arr1.concat(arr2).reduce((acc, x) => {
+    //     acc[x._id] = Object.assign(acc[x._id] || {}, x);
+    //     return acc;
+    // }, {});
+    // const newArray = Object.values(array).map(({_id, ...keepAttrs}) => keepAttrs);
+    // console.log(newArray)
+    // return array
+
+    var array = [...arr1, ...arr2].reduce((acc, val, ind) => {
+        const index = acc.findIndex(el => el._id.toString() === val._id.toString());
+        if (index !== -1) {
+           const key = Object.keys(val)[arrKey];
+           acc[index][key] = val[key];
+        } else {
+           acc.push(val);
+        };
+        return acc;
+     }, []);
+
+     return array
 }
 
 export function getDayOfMonth(e) {
-    let startDate = new Date(moment(e).startOf('month').set({ 'hour': 0, 'minute': 0, "second": 1 }));
-    let endDate = new Date(moment(e).endOf('month').set({ 'hour': 23, 'minute': 59, "second": 59 }));
+    // let startDate = new Date(moment(e).startOf('month').set({ 'hour': 0, 'minute': 0, "second": 1 }));
+    // let endDate = new Date(moment(e).endOf('month').set({ 'hour': 23, 'minute': 59, "second": 59 }));
+
+    let startDate = moment(e).startOf('month').set({ 'hour': 0, 'minute': 0, "second": 1 });
+    let endDate = moment(e).endOf('month').set({ 'hour': 23, 'minute': 59, "second": 59 });
+
+    return { startDate: startDate, endDate: endDate }
+}
+
+export function getDayOfYear(e) {
+    // let startDate = new Date(moment(e).startOf('month').set({ 'hour': 0, 'minute': 0, "second": 1 }));
+    // let endDate = new Date(moment(e).endOf('month').set({ 'hour': 23, 'minute': 59, "second": 59 }));
+
+    let startDate = moment(e).startOf('year').set({ 'hour': 0, 'minute': 0, "second": 1 });
+    let endDate = moment(e).endOf('year').set({ 'hour': 23, 'minute': 59, "second": 59 });
 
     return { startDate: startDate, endDate: endDate }
 }
@@ -112,4 +144,13 @@ export function getDayOfMonth(e) {
 export function getLastMonthCode(e) {
     let lastMonth = moment(e).month() - 1
     return moment(e).month(lastMonth).format("MMM-YYYY")
+}
+
+export function getDayOfDay(day) {
+
+    var e = moment().set({ 'date': day, 'month': moment().month(), 'year': moment().year() })
+    let startDate = new Date(moment(e).startOf('date'));
+    let endDate = new Date(moment(e).endOf('date'));
+
+    return { startDate: startDate, endDate: endDate }
 }

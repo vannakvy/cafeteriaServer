@@ -7,6 +7,7 @@ const product = gql`
         code: String
         description: String!
         image: String
+        cost: Float!
         price: Float!
         um: String!
         category: Category
@@ -26,6 +27,7 @@ const product = gql`
         code: String
         description: String!
         image: String
+        cost: Float!
         price: Float!
         um: String!
         category: String!
@@ -37,6 +39,7 @@ const product = gql`
         code: String
         description: String
         image: String
+        cost: Float
         price: Float
         um: String
         category: String

@@ -57,7 +57,10 @@ const userResolvers = {
         }, context) {
             try {
                 // console.log(input)
-                const user = await Users.findOne({ uid: input.id })
+                const user = await Users.findOne({ uid: input.id }).populate({
+                    path: "contentRole",
+                    populate: "content"
+                })
                 const contents = await Users.aggregate([
                     {
                         $match: { _id: mongoose.Types.ObjectId(user.id) }
@@ -95,8 +98,9 @@ const userResolvers = {
                     {
                         $sort: { createAt: 1 }
                     }
-
                 ])
+
+                // console.log(contents)
 
                 return {
                     profile: user,

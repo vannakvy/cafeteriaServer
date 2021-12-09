@@ -6,6 +6,7 @@ const reconciliation = gql`
         id: String
         code: String
         products: [ReconProducts]
+        accounting: SubAccounting
         date: Float
         remark: String
     }
@@ -26,17 +27,40 @@ const reconciliation = gql`
         total: Float
     }
 
-    input generateInvInput {
+    type SubAccounting {
+        openning: PaidNonPaid
+        income: PaidNonPaid
+        expense: PaidNonPaid
+        closing: PaidNonPaid
+    }
+
+    type PaidNonPaid {
+        paid: Float
+        nonPaid: Float
+    }
+
+    input GenerateInvInput {
         date: String
         remark: String
     }
 
+    input GenerateAccInput {
+        id: String
+    }
+
+    input PaidNonPaidInput {
+        paid: Float
+        nonPaid: Float
+    }
+
     type Query {
         phsicalInventory(input: InputPagination): [Reconciliation]
+        getInventory(input: InputPagination): [Reconciliation]
     }
 
     type Mutation {
-        generateInventory(input: generateInvInput): String
+        generateInventory(input: GenerateInvInput): String
+        generateAccounting(input: GenerateAccInput): String
     }
     
 `;
