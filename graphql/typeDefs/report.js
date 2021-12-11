@@ -22,6 +22,8 @@ const report = gql`
         getReportProductByDate(input: InputDate): [ReportProduct]
         getReportProductByRangeDate(input: InputRangeDate): [ReportProduct]
         getReportCategoryByDate(input: InputRangeDate): [ReportCategory]
+        getReportSaleOrderByRangeDate(input: InputRangeDate): [SaleOrder]
+        getReportPurchaseOrderByRangeDate(input: InputRangeDate): [PurchaseOrder]
     }
 `;
 

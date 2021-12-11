@@ -66,7 +66,7 @@ import { botAction } from "./TelegramBot/botAction.js";
 
     const PORT = process.env.PORT
 
-    await mongoose.connect(CONFIG.MONGODB, { useNewUrlParser: true }, (err) => {
+    await mongoose.connect(process.env.MONGODB, { useNewUrlParser: true }, (err) => {
         if (!err) {
             console.log("DB Connected")
             httpServer.listen(PORT, () =>

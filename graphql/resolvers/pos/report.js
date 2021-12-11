@@ -287,6 +287,38 @@ const reportResolvers = {
             } catch (error) {
                 throw new Error(error)
             }
+        },
+        async getReportSaleOrderByRangeDate(_, {
+            input
+        }, context){
+            try {
+                let startDate = convertTZ(input.startDate)
+                let endDate = convertTZ(input.endDate)
+
+                const saleOrder = await SaleOrder.find(
+                    { "date": { "$gte": startDate, "$lte": endDate } }
+                ).sort({ createdAt: -1 })
+
+                return saleOrder
+            } catch (error) {
+                throw new Error(error)
+            }
+        },
+        async getReportPurchaseOrderByRangeDate(_, {
+            input
+        }, context){
+            try {
+                let startDate = convertTZ(input.startDate)
+                let endDate = convertTZ(input.endDate)
+
+                const purchaseOrder = await PurchaseOrders.find(
+                    { "date": { "$gte": startDate, "$lte": endDate } }
+                ).sort({ createdAt: -1 })
+
+                return purchaseOrder
+            } catch (error) {
+                throw new Error(error)
+            }
         }
     },
     Mutation: {
