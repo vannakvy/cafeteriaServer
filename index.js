@@ -7,7 +7,6 @@ import { ApolloServer } from "apollo-server-express";
 import typeDefs from './graphql/typeDefs.js'
 import resolvers from './graphql/resolvers.js'
 import { PubSub } from 'graphql-subscriptions';
-import { CONFIG } from './config.js'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import TelegramBot from 'node-telegram-bot-api'
@@ -21,8 +20,8 @@ import { botAction } from "./TelegramBot/botAction.js";
 
     app.use(cors())
 
-    const bot = new TelegramBot(process.env.TELEGRAM_TOKEN, { polling: true });
-    botAction(bot)
+    // const bot = new TelegramBot(process.env.TELEGRAM_TOKEN, { polling: true });
+    // botAction(bot)
 
     const pubsub = new PubSub();
 

@@ -6,6 +6,9 @@ import Reconciliation from "../../../models/pos/reconciliation.js"
 
 const reportResolvers = {
     Query: {
+
+    },
+    Mutation: {
         async getReportProductByDate(_, {
             input
         }, context){
@@ -109,7 +112,7 @@ const reportResolvers = {
                     return acc;
                 }, [])
 
-                return (productReport)
+                return productReport
 
 
             } catch (error) {
@@ -313,16 +316,13 @@ const reportResolvers = {
 
                 const purchaseOrder = await PurchaseOrders.find(
                     { "date": { "$gte": startDate, "$lte": endDate } }
-                ).sort({ createdAt: -1 })
+                ).sort({ createAt: -1 })
 
                 return purchaseOrder
             } catch (error) {
                 throw new Error(error)
             }
         }
-    },
-    Mutation: {
-
     },
     Subscription: {
 

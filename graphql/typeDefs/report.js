@@ -18,7 +18,7 @@ const report = gql`
         totalStock: Float
     }
 
-    type Query {
+    type Mutation {
         getReportProductByDate(input: InputDate): [ReportProduct]
         getReportProductByRangeDate(input: InputRangeDate): [ReportProduct]
         getReportCategoryByDate(input: InputRangeDate): [ReportCategory]

@@ -54,6 +54,7 @@ const product = gql`
         getProductsRangeDate(input: InputRangeDate): ProductResponse
         getProductById(input: InputId!): Product
         getProductBySelectCTG(input: InputPagination): ProductResponse
+        getAllProducts: [Product]
     }
 
     type Mutation {

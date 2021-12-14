@@ -105,18 +105,13 @@ const productResolvers = {
                 throw new Error(err)
             }
         },
-        async getProductsRangeDate(_, {
+        async getAllProducts(_, {
             input
         }, context) {
             try {
-                const product = await Products.find(
-                    { "createAt": { "$gte": convertQueryDate(input.startDate), "$lte": convertQueryDate(input.endDate) } }
-                ).sort({ createdAt: -1 })
+                const product = await Products.find().sort({ createAt: -1 }).populate("category")
 
-                return {
-                    data: product,
-                    message: "ការបញ្ចូលបានជោគជ័យ"
-                }
+                return product
             } catch (err) {
                 throw new Error(err)
             }
