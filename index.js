@@ -65,13 +65,15 @@ import { botAction } from "./TelegramBot/botAction.js";
 
     const PORT = process.env.PORT
 
+    httpServer.listen(PORT, () =>
+        console.log(`Server is now running on http://localhost:${PORT}/graphql`)
+    );
+
     await mongoose.connect(process.env.MONGODB, { useNewUrlParser: true }, (err) => {
         if (!err) {
             console.log("DB Connected")
-            httpServer.listen(PORT, () =>
-                console.log(`Server is now running on http://localhost:${PORT}/graphql`)
-            );
         }
     })
+
 
 })();

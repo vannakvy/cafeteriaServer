@@ -154,3 +154,11 @@ export function getDayOfDay(day) {
 
     return { startDate: startDate, endDate: endDate }
 }
+
+export function getStartTimeOfDate(e){
+    return moment(e).set({ 'hour': 0, 'minute': 0, "second": 1 });
+}
+export function getEndTimeOfDate(e){
+    return moment(e).set({ 'hour': 23, 'minute': 59, "second": 59 });
+
+}
