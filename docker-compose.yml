@@ -4,7 +4,7 @@ services:
     container_name: server
     build: .
     volumes:
-      - .:/usr/src/app
+      - .:/app
     ports:
       - "5500:5500"
     networks:
@@ -22,3 +22,6 @@ services:
 networks:
   mart_network:
     driver: bridge
+volumes:
+  mongo-data:
+    driver: local
