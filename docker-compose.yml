@@ -1,0 +1,24 @@
+version: "3"
+services:
+  server:
+    container_name: server
+    build: .
+    volumes:
+      - .:/usr/src/app
+    ports:
+      - "5500:5500"
+    networks:
+      - mart_network
+  mongo:
+    container_name: mongo
+    image: mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    networks:
+      - mart_network
+    volumes:
+      - ./db:/data/db
+networks:
+  mart_network:
+    driver: bridge
