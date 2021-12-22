@@ -179,9 +179,9 @@ const categoryResolvers = {
         }, context) {
             try {
                 const findProductByCategory = await Products.find({ "category._id": input.id })
-                console.log("test")
+                // console.log("test")
 
-                if (findProductByCategory === null) {
+                if (findProductByCategory.length === 0) {
                     const findCategory = await Categories.findByIdAndDelete(input.id)
 
                     if (findCategory !== null) {
