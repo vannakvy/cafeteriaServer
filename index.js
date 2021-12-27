@@ -12,6 +12,7 @@ import dotenv from 'dotenv'
 import TelegramBot from 'node-telegram-bot-api'
 import mongoose from 'mongoose'
 import { botAction } from "./TelegramBot/botAction.js";
+import { admin } from './config.js'
 
 (async function () {
     const app = express();
